@@ -72,5 +72,9 @@ PLIST
 # Create PkgInfo
 echo -n "APPL????" > "${CONTENTS}/PkgInfo"
 
+# Code sign
+IDENTITY="${CODESIGN_IDENTITY:-Developer ID Application: Christian Stephens (H45U5SB635)}"
+codesign --force --deep --options runtime --sign "${IDENTITY}" "${BUNDLE_DIR}"
+
 echo "Built: ${BUNDLE_DIR}"
 echo "Run:   open ${BUNDLE_DIR}"

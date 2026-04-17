@@ -15,6 +15,16 @@ open .build/Farbauswahl.app
 
 Requires macOS 14+ and Xcode Command Line Tools (`xcode-select --install`).
 
+### Download
+
+Grab the zip from [Releases](https://github.com/qoodeng/farbauswahl/releases), unzip, drag to Applications. Then run once in Terminal:
+
+```bash
+xattr -cr /Applications/Farbauswahl.app
+```
+
+This clears the Gatekeeper quarantine flag (the app is unsigned). Then open normally.
+
 For a release build:
 
 ```bash
