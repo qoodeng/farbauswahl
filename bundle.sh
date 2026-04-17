@@ -52,6 +52,8 @@ cat > "${CONTENTS}/Info.plist" << 'PLIST'
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleURLTypes</key>
@@ -68,6 +70,9 @@ cat > "${CONTENTS}/Info.plist" << 'PLIST'
 </dict>
 </plist>
 PLIST
+
+# Copy app icon
+cp AppIcon.icns "${RESOURCES}/AppIcon.icns" 2>/dev/null || true
 
 # Create PkgInfo
 echo -n "APPL????" > "${CONTENTS}/PkgInfo"
