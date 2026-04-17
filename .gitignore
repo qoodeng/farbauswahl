@@ -1,0 +1,9 @@
+.build/
+.swiftpm/
+.agents/
+.claude/
+*.xcodeproj
+xcuserdata/
+DerivedData/
+.DS_Store
+skills-lock.json

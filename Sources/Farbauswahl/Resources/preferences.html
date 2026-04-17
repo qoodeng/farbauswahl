@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+:root {
+  --m: 'Geist Mono', 'Roboto Mono', 'SF Mono', monospace;
+  --fg: #2a2a2a; --fg2: #555; --fg3: #888;
+  --bg: #FFFFFF; --bg2: #F4F4F4; --bg-hover: #ECECEC;
+  --rule: #E0E0E0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--m); color: var(--fg); background: var(--bg);
+  user-select: none; -webkit-user-select: none; overflow: hidden;
+}
+.header {
+  padding: 8px 12px; border-bottom: 1px solid var(--rule);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; border-bottom: 1px solid var(--rule);
+  font-size: 10px; min-height: 32px;
+}
+.row-label { color: var(--fg); }
+.row-desc { font-size: 8px; color: var(--fg3); margin-top: 2px; }
+.toggle {
+  width: 32px; height: 18px; border: 1px solid var(--rule);
+  background: var(--bg2); cursor: pointer; position: relative;
+}
+.toggle.on { background: var(--fg); }
+.toggle-knob {
+  width: 14px; height: 14px; background: var(--bg);
+  border: 1px solid var(--rule); position: absolute; top: 1px; left: 1px;
+}
+.toggle.on .toggle-knob { left: auto; right: 1px; border-color: var(--fg); }
+.section { padding: 6px 12px; font-size: 8px; color: var(--fg3);
+  letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--rule);
+}
+.version { padding: 8px 12px; font-size: 8px; color: var(--fg3); text-align: center; }
+.mode-btn {
+  padding: 3px 8px; font-size: 9px; font-family: var(--m);
+  border: 1px solid var(--rule); cursor: pointer; color: var(--fg3);
+}
+.mode-btn.active { background: var(--fg); color: var(--bg); }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #c8cace; --fg2: #9a9ca0; --fg3: #606266;
+    --bg: #1a1a1a; --bg2: #222; --bg-hover: #2a2a2a; --rule: #333;
+  }
+}
+</style>
+</head>
+<body>
+<div class="header">Preferences</div>
+
+<div class="section">Behavior</div>
+<div class="row">
+  <div><div class="row-label">Launch at login</div></div>
+  <div class="toggle" id="t-launch" onclick="toggle('launchAtLogin')"><div class="toggle-knob"></div></div>
+</div>
+<div class="row">
+  <div><div class="row-label">Float above windows</div></div>
+  <div class="toggle" id="t-float" onclick="toggle('floatAboveWindows')"><div class="toggle-knob"></div></div>
+</div>
+
+<div class="section">Picking</div>
+<div class="row">
+  <div><div class="row-label">Auto-copy hex on pick</div></div>
+  <div class="toggle" id="t-autocopy" onclick="toggle('autoCopyOnPick')"><div class="toggle-knob"></div></div>
+</div>
+<div class="row">
+  <div><div class="row-label">Hide window while picking</div></div>
+  <div class="toggle" id="t-hide" onclick="toggle('hideWhilePicking')"><div class="toggle-knob"></div></div>
+</div>
+
+<div class="section">Appearance</div>
+<div class="row">
+  <div><div class="row-label">Mode</div></div>
+  <div style="display:flex; gap:4px;">
+    <div class="mode-btn" id="m-system" onclick="setMode('system')">System</div>
+    <div class="mode-btn" id="m-light" onclick="setMode('light')">Light</div>
+    <div class="mode-btn" id="m-dark" onclick="setMode('dark')">Dark</div>
+  </div>
+</div>
+<div class="row">
+  <div><div class="row-label">Font</div></div>
+  <div style="display:flex; gap:4px;">
+    <div class="mode-btn" id="f-ioskeley" onclick="setFont('ioskeley')">Ioskeley</div>
+    <div class="mode-btn" id="f-geist" onclick="setFont('geist')">Geist</div>
+    <div class="mode-btn" id="f-helvetica" onclick="setFont('helvetica')">Helvetica</div>
+  </div>
+</div>
+
+<div class="version">Farbauswahl v0.1.0</div>
+
+<script>
+function post(action, data) {
+  window.webkit.messageHandlers.farbauswahl.postMessage(Object.assign({action}, data || {}));
+}
+function toggle(key) {
+  const map = {launchAtLogin:'t-launch', floatAboveWindows:'t-float', autoCopyOnPick:'t-autocopy', hideWhilePicking:'t-hide'};
+  const toggle = document.getElementById(map[key]);
+  const newVal = !toggle.classList.contains('on');
+  toggle.classList.toggle('on', newVal);
+  post('setSetting', {key, value: newVal});
+}
+function setFont(font) {
+  ['ioskeley','geist','helvetica'].forEach(f => {
+    document.getElementById('f-' + f).classList.toggle('active', f === font);
+  });
+  post('setSetting', {key: 'font', value: font});
+}
+function setMode(mode) {
+  ['system','light','dark'].forEach(m => {
+    document.getElementById('m-' + m).classList.toggle('active', m === mode);
+  });
+  post('setSetting', {key: 'appearance', value: mode});
+}
+function loadSettings(s) {
+  document.getElementById('t-launch').classList.toggle('on', s.launchAtLogin);
+  document.getElementById('t-float').classList.toggle('on', s.floatAboveWindows);
+  document.getElementById('t-autocopy').classList.toggle('on', s.autoCopyOnPick);
+  document.getElementById('t-hide').classList.toggle('on', s.hideWhilePicking);
+  ['system','light','dark'].forEach(m => {
+    document.getElementById('m-' + m).classList.toggle('active', m === s.appearance);
+  });
+  ['ioskeley','geist','helvetica'].forEach(f => {
+    document.getElementById('f-' + f).classList.toggle('active', f === s.font);
+  });
+}
+</script>
+</body>
+</html>

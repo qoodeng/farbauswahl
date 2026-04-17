@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+:root {
+  --m: 'Ioskeley Mono', 'Geist Mono', 'SF Mono', monospace;
+  --fg: #2a2a2a;
+  --fg2: #555555;
+  --fg3: #888888;
+  --bg: #FFFFFF;
+  --bg2: #F4F4F4;
+  --bg-hover: #ECECEC;
+  --rule: #E0E0E0;
+
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--m);
+  color: var(--fg);
+  background: var(--bg);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+/* ── FONT MODES ── */
+body.font-geist { font-family: 'Geist Mono', 'SF Mono', monospace; }
+body.font-helvetica { font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif; }
+
+/* ── SWISS MODE ── */
+body.swiss {
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 700;
+}
+body.swiss * { text-transform: lowercase !important; letter-spacing: 0.01em !important; }
+body.swiss .header { border-bottom-width: 2px; }
+body.swiss .header-name { font-size: 12px; }
+body.swiss .section-hdr { font-size: 9px; }
+body.swiss .val-label { font-size: 9px; }
+body.swiss .val-code { font-size: 10px; }
+body.swiss .val-copy { font-size: 7px; }
+body.swiss .contrast-block-label { font-size: 7px; }
+body.swiss .contrast-block-value { font-size: 12px; }
+body.swiss .fix-row { font-size: 8px; }
+body.swiss .swatch-label { font-size: 8px; }
+body.swiss .badge { font-family: 'Helvetica Neue', 'Helvetica', sans-serif; font-weight: 700; font-size: 7px; }
+body.swiss .swap-btn { font-family: 'Helvetica Neue', 'Helvetica', sans-serif; font-weight: 700; }
+body.swiss .keybind { font-family: 'Helvetica Neue', 'Helvetica', sans-serif; font-weight: 700; font-size: 7px; }
+body.swiss .copied-flash { font-family: 'Helvetica Neue', 'Helvetica', sans-serif; font-weight: 700; }
+
+
+/* ── HEADER ── */
+.header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 6px 8px; border-bottom: 1px solid var(--rule);
+}
+.header-name {
+  font-size: 11px; font-weight: 400;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.header-ver { font-size: 9px; letter-spacing: 0.06em; color: var(--fg3); }
+
+.subheader {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 4px 8px; border-bottom: 1px solid var(--rule);
+  font-size: 8px; letter-spacing: 0.08em; color: var(--fg3); text-transform: uppercase;
+}
+
+/* ── DUAL SWATCH ── */
+.dual-swatch-wrap { position: relative; }
+.dual-swatch { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--rule); }
+.swatch-panel { position: relative; min-height: 90px; cursor: pointer; }
+.swatch-panel:first-child { border-right: 1px solid var(--rule); }
+.swatch-fill { position: absolute; inset: 0; }
+.swatch-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 8px;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.swatch-label {
+  position: absolute; top: 4px; left: 8px;
+  font-size: 8px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.picker-btn {
+  position: absolute; top: 0px; right: 8px;
+  font-size: 14px; cursor: pointer; opacity: 0.5;
+}
+.picker-btn:hover { opacity: 1; }
+.swap-btn {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;
+  width: 24px; height: 24px; border: 1px solid var(--rule); background: var(--bg);
+  color: var(--fg); font-size: 11px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-family: var(--m); line-height: 1;
+  box-shadow: 1px 1px 0 var(--fg);
+}
+.swap-btn:hover { background: var(--fg); color: var(--bg); }
+
+/* ── VALUES ── */
+.section-hdr {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 8px; border-bottom: 1px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);
+}
+.section-hdr-r { font-size: 8px; letter-spacing: 0.08em; font-family: var(--m); font-weight: 400; color: var(--fg3); }
+.val-row {
+  display: flex; align-items: center; border-bottom: 1px solid var(--rule);
+  font-size: 11px; min-height: 24px; cursor: pointer;
+}
+.val-row:hover { background: var(--bg2); }
+.val-label {
+  width: 50px; padding: 0 6px; font-size: 9px; letter-spacing: 0.08em; color: var(--fg3);
+  text-transform: uppercase; flex-shrink: 0; border-right: 1px solid var(--rule);
+  align-self: stretch; display: flex; align-items: center;
+}
+.val-code { flex: 1; padding: 0 6px; font-size: 10px; color: var(--fg); letter-spacing: 0.02em; }
+.val-copy {
+  padding: 0 6px; font-size: 7px; letter-spacing: 0.1em; color: var(--fg3);
+  text-transform: uppercase; opacity: 0;
+}
+.val-row:hover .val-copy { opacity: 1; }
+
+/* ── CONTRAST ── */
+.contrast-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--rule); }
+.contrast-block { padding: 5px 8px; border-right: 1px solid var(--rule); }
+.contrast-block:last-child { border-right: none; }
+.contrast-block-label {
+  font-size: 7px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg3); margin-bottom: 1px;
+}
+.contrast-block-value { font-size: 12px; color: var(--fg); letter-spacing: 0.02em; }
+
+.badge {
+  display: inline-block; font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 1px 4px; margin-right: 3px; font-family: var(--m); font-weight: 400;
+}
+.badge-pass {
+  background: var(--fg); color: var(--bg); border: none;
+}
+.badge-fail {
+  background: none; border: 1px solid var(--rule); color: var(--fg3); position: relative;
+}
+.badge-fail::after {
+  content: ''; position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 1px solid var(--fg3);
+}
+
+.fix-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 8px; border-bottom: 1px solid var(--rule); min-height: 24px;
+  font-size: 8px; color: var(--fg2); letter-spacing: 0.06em; cursor: pointer;
+}
+.fix-row:hover { background: var(--bg2); }
+.keybind {
+  display: inline-block; font-size: 7px; padding: 1px 4px;
+  border: 1px solid var(--fg); background: var(--bg);
+  color: var(--fg); letter-spacing: 0.04em; margin-left: 3px; font-family: var(--m);
+  box-shadow: 1px 1px 0 var(--fg);
+}
+
+/* ── HISTORY / LIBRARY SWATCHES ── */
+.swatch-grid { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--rule); }
+.s-swatch {
+  width: 24px; height: 24px; border-right: 1px solid var(--rule);
+  cursor: pointer;
+}
+.s-swatch:hover { opacity: 0.8; }
+
+/* ── CONTEXT MENU ── */
+.ctx-menu {
+  position: fixed; z-index: 200; background: var(--bg);
+  border: 1px solid var(--fg); padding: 2px 0;
+  font-size: 9px; letter-spacing: 0.04em; min-width: 150px;
+  display: none; box-shadow: 2px 2px 0 var(--fg);
+}
+.ctx-item {
+  padding: 4px 10px; cursor: pointer; color: var(--fg);
+}
+.ctx-item:hover { background: var(--bg-hover); }
+
+/* ── STATUS ── */
+.status-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  font-size: 7px; letter-spacing: 0.08em; color: var(--fg3); text-transform: uppercase;
+  border-top: 1px solid var(--rule);
+}
+.status-cell { padding: 4px 8px; border-right: 1px solid var(--rule); }
+.status-cell:last-child { border-right: none; }
+.status-cell-label { color: var(--fg); }
+.status-cell-value { color: var(--fg2); margin-top: 1px; }
+
+.copied-flash {
+  position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+  background: var(--fg); color: var(--bg); font-size: 8px; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 4px 12px; font-family: var(--m);
+  opacity: 0; pointer-events: none; z-index: 100;
+  box-shadow: 2px 2px 0 var(--rule);
+}
+.copied-flash.show { opacity: 1; }
+
+/* ── DARK MODE ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #c8cace; --fg2: #9a9ca0; --fg3: #606266;
+    --bg: #1a1a1a; --bg2: #222222; --bg-hover: #2a2a2a;
+    --rule: #333333;
+  }
+  .badge-pass { background: var(--fg); color: var(--bg); }
+  .swap-btn { background: var(--bg); }
+  .ctx-menu { background: var(--bg2); border-color: var(--rule); box-shadow: 2px 2px 0 var(--rule); }
+  .keybind { background: var(--bg); color: var(--fg); border-color: var(--rule); box-shadow: 1px 1px 0 var(--rule); }
+}
+</style>
+</head>
+<body>
+<div class="copied-flash" id="flash">Copied</div>
+<div class="ctx-menu" id="ctx-menu"></div>
+
+<div class="header">
+  <span class="header-name">Farbauswahl</span>
+  <span class="header-ver">v0.1.0</span>
+</div>
+<div class="subheader">
+  <span>Color instrument</span>
+  <span>⌘⇧C foreground · ⌘⇧V background</span>
+</div>
+
+<div class="dual-swatch-wrap">
+  <div class="dual-swatch">
+    <div class="swatch-panel" id="swatch-fg" onclick="post('pickForeground')">
+      <div class="swatch-fill" id="fg-fill"></div>
+      <div class="swatch-label" id="fg-label">Foreground</div>
+      <div class="picker-btn" id="fg-picker" onclick="event.stopPropagation(); post('openPickerForeground')">&#9998;</div>
+      <div class="swatch-overlay" id="fg-overlay"></div>
+    </div>
+    <div class="swatch-panel" id="swatch-bg" onclick="post('pickBackground')">
+      <div class="swatch-fill" id="bg-fill"></div>
+      <div class="swatch-label" id="bg-label">Background</div>
+      <div class="picker-btn" id="bg-picker" onclick="event.stopPropagation(); post('openPickerBackground')">&#9998;</div>
+      <div class="swatch-overlay" id="bg-overlay"></div>
+    </div>
+  </div>
+  <div class="swap-btn" onclick="post('swap')">⇄</div>
+</div>
+
+<div class="section-hdr">
+  <span>Foreground values</span>
+</div>
+<div id="values"></div>
+
+<div class="section-hdr">
+  <span>Contrast</span>
+  <span class="section-hdr-r" id="contrast-pair"></span>
+</div>
+<div id="contrast"></div>
+<div class="fix-row" id="fix-row" style="display:none" onclick="post('applyFix')"></div>
+
+<div class="section-hdr">
+  <span>History</span>
+  <span class="section-hdr-r">⌘Z undo · ⌘⇧Z redo</span>
+</div>
+<div class="swatch-grid" id="history"></div>
+
+<div class="section-hdr">
+  <span>Library</span>
+  <span class="section-hdr-r" id="lib-count">0 saved · ⌥S save</span>
+</div>
+<div class="swatch-grid" id="library"></div>
+
+<div class="status-row">
+  <div class="status-cell"><div class="status-cell-label">Display</div><div class="status-cell-value" id="st-display">—</div></div>
+  <div class="status-cell"><div class="status-cell-label">Gamut</div><div class="status-cell-value" id="st-gamut">—</div></div>
+  <div class="status-cell"><div class="status-cell-label">Luminance</div><div class="status-cell-value" id="st-lum">—</div></div>
+</div>
+
+
+<script>
+function post(action, data) {
+  window.webkit.messageHandlers.farbauswahl.postMessage(Object.assign({action}, data || {}));
+}
+
+function copyValue(val) {
+  post('copy', {value: val});
+  const f = document.getElementById('flash');
+  f.textContent = 'Copied: ' + val;
+  f.classList.add('show');
+  setTimeout(() => f.classList.remove('show'), 1500);
+}
+
+function luminance(hex) {
+  hex = hex.replace('#','');
+  const r = parseInt(hex.substring(0,2),16)/255;
+  const g = parseInt(hex.substring(2,4),16)/255;
+  const b = parseInt(hex.substring(4,6),16)/255;
+  const lin = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+  return 0.2126*lin(r) + 0.7152*lin(g) + 0.0722*lin(b);
+}
+
+function textColor(hex) { return luminance(hex) > 0.18 ? '#000' : '#fff'; }
+
+function mkBadge(text, pass) {
+  const el = document.createElement('span');
+  el.className = 'badge ' + (pass ? 'badge-pass' : 'badge-fail');
+  el.textContent = text;
+  return el;
+}
+
+function mkValRow(label, value) {
+  const row = document.createElement('div');
+  row.className = 'val-row';
+  row.onclick = () => copyValue(value);
+
+  const lb = document.createElement('div');
+  lb.className = 'val-label';
+  lb.textContent = label;
+
+  const cd = document.createElement('div');
+  cd.className = 'val-code';
+  cd.textContent = value;
+
+  const cp = document.createElement('div');
+  cp.className = 'val-copy';
+  cp.textContent = 'Copy';
+
+  row.append(lb, cd, cp);
+  return row;
+}
+
+function mkContrastGrid(ratioLabel, ratioVal, compLabel, badges) {
+  const grid = document.createElement('div');
+  grid.className = 'contrast-grid';
+
+  const left = document.createElement('div');
+  left.className = 'contrast-block';
+  const ll = document.createElement('div');
+  ll.className = 'contrast-block-label';
+  ll.textContent = ratioLabel;
+  const lv = document.createElement('div');
+  lv.className = 'contrast-block-value';
+  lv.textContent = ratioVal;
+  left.append(ll, lv);
+
+  const right = document.createElement('div');
+  right.className = 'contrast-block';
+  const rl = document.createElement('div');
+  rl.className = 'contrast-block-label';
+  rl.textContent = compLabel;
+  const rv = document.createElement('div');
+  rv.className = 'contrast-block-value';
+  badges.forEach(b => rv.appendChild(mkBadge(b[0], b[1])));
+  right.append(rl, rv);
+
+  grid.append(left, right);
+  return grid;
+}
+
+function mkSwatch(hex, source) {
+  const el = document.createElement('div');
+  el.className = 's-swatch';
+  el.style.background = hex;
+  el.onclick = () => copyValue(hex);
+  el.oncontextmenu = (e) => { e.preventDefault(); showCtxMenu(e, hex, source); };
+  return el;
+}
+
+// ── Context menu ──
+function showCtxMenu(e, hex, source) {
+  const menu = document.getElementById('ctx-menu');
+  menu.replaceChildren();
+  const items = [
+    ['Apply as Foreground', () => post('setForeground', {hex})],
+    ['Apply as Background', () => post('setBackground', {hex})],
+    ['Copy Hex', () => copyValue(hex)],
+  ];
+  if (source === 'library') {
+    items.push(['Remove from Library', () => post('removeFromLibrary', {hex})]);
+  }
+  items.forEach(([label, action]) => {
+    const item = document.createElement('div');
+    item.className = 'ctx-item';
+    item.textContent = label;
+    item.onclick = () => { hideCtxMenu(); action(); };
+    menu.appendChild(item);
+  });
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 160) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - (items.length * 26)) + 'px';
+  menu.style.display = 'block';
+}
+function hideCtxMenu() { document.getElementById('ctx-menu').style.display = 'none'; }
+document.addEventListener('click', hideCtxMenu);
+
+function updateUI(d) {
+  const fgTC = textColor(d.fg), bgTC = textColor(d.bg);
+  document.getElementById('fg-fill').style.background = d.fg;
+  document.getElementById('bg-fill').style.background = d.bg;
+  document.getElementById('fg-label').style.color = fgTC;
+  document.getElementById('fg-overlay').style.color = fgTC;
+  document.getElementById('bg-label').style.color = bgTC;
+  document.getElementById('bg-overlay').style.color = bgTC;
+  document.getElementById('fg-picker').style.color = fgTC;
+  document.getElementById('bg-picker').style.color = bgTC;
+
+  const vals = document.getElementById('values');
+  vals.replaceChildren();
+  if (d.colorName) vals.appendChild(mkValRow('Name', d.colorName));
+  d.values.forEach(v => vals.appendChild(mkValRow(v.label, v.value)));
+  vals.appendChild(mkValRow('P3', d.p3));
+
+  document.getElementById('contrast-pair').textContent = d.fg + ' on ' + d.bg;
+  const ct = document.getElementById('contrast');
+  ct.replaceChildren();
+  ct.appendChild(mkContrastGrid('WCAG 2.1 ratio', d.wcagRatio, 'WCAG 2.1',
+    [['AA LG', d.wcagAALarge], ['AA', d.wcagAA], ['AAA', d.wcagAAA]]));
+  ct.appendChild(mkContrastGrid('APCA Lc', d.apcaLc, 'APCA use',
+    [['Body', d.apcaBody], ['Large', d.apcaLarge], ['Fine', d.apcaFine]]));
+
+  const fr = document.getElementById('fix-row');
+  if (d.fixApplied) {
+    fr.style.display = '';
+    fr.style.cursor = 'default';
+    fr.onclick = null;
+    fr.replaceChildren();
+    const span1 = document.createElement('span');
+    span1.textContent = 'Fix applied \u2014 contrast now passes';
+    span1.style.color = 'var(--fg2)';
+    fr.appendChild(span1);
+  } else if (d.fix) {
+    fr.style.display = '';
+    fr.style.cursor = 'pointer';
+    fr.onclick = () => post('applyFix');
+    fr.replaceChildren();
+    const span1 = document.createElement('span');
+    span1.textContent = 'Fix \u2192 ' + d.fix.hex + ' (' + d.fix.wcag + ', Lc ' + d.fix.apca + ')';
+    const span2 = document.createElement('span');
+    span2.style.color = 'var(--fg2)';
+    span2.textContent = 'Apply ';
+    const kb = document.createElement('span');
+    kb.className = 'keybind';
+    kb.textContent = '\u2325F';
+    span2.appendChild(kb);
+    fr.append(span1, span2);
+  } else { fr.style.display = 'none'; }
+
+  const hist = document.getElementById('history');
+  hist.replaceChildren();
+  d.history.forEach(h => hist.appendChild(mkSwatch(h, 'history')));
+
+  document.getElementById('lib-count').textContent = d.libraryCount + ' saved \u00b7 \u2325S save';
+  const lib = document.getElementById('library');
+  lib.replaceChildren();
+  d.library.forEach(l => lib.appendChild(mkSwatch(l, 'library')));
+
+  document.getElementById('st-display').textContent = d.displayProfile;
+  document.getElementById('st-gamut').textContent = d.gamut;
+  document.getElementById('st-lum').textContent = d.luminance;
+
+  // Font
+  document.body.classList.remove('font-geist', 'font-helvetica');
+  if (d.font === 'geist') document.body.classList.add('font-geist');
+  else if (d.font === 'helvetica') document.body.classList.add('font-helvetica');
+}
+</script>
+</body>
+</html>
