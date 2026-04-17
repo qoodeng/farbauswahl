@@ -7,7 +7,7 @@ Pick any color from your screen and get it in 8 formats — hex, RGB, HSL, HSB, 
 ## Install
 
 ```bash
-git clone https://github.com/smeatoh/farbauswahl
+git clone https://github.com/qoodeng/farbauswahl
 cd farbauswahl
 bash bundle.sh
 open .build/Farbauswahl.app
